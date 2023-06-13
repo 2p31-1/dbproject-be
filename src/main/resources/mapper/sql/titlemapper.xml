@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nettopulikkusu">
+
+  <!-- user select by userid-->
+  <select id="selectUser" resultType="com.nettopulikkusu.DTO.userDTO" parameterType="String">
+    SELECT *
+    from user
+    where userId=#{userId}
+  </select>
+
+  <!-- select movie by user like-->
+  <select id="selectMovie" resultType="com.nettopulikkusu.DTO.titleDTO" parameterType="String">
+    SELECT movieTitle, ratingScore
+    from user natural join movie natural join ratings
+    where userId=#{userId}
+    order by ratingScore desc;
+  </select>
+<!-- 직업별 추천 -->
+  <select id="selectOccupationMovie" resultType="com.nettopulikkusu.DTO.titleDTO" parameterType="String">
+    SELECT movieTitle, avg(ratingScore)
+    FROM user natural join movie natural join ratings
+    where occupation=(SELECT occupation FROM user WHERE userId=#{userId})
+    GROUP BY movieId
+    order by avg(ratingScore) desc
+      limit 10;
+  </select>
+<!-- 연령대별 추천-->
+  <select id="selectAgeMovie" resultType="com.nettopulikkusu.DTO.titleDTO" parameterType="String">
+    SELECT movieTitle, avg(ratingScore)
+    FROM user natural join movie natural join ratings
+    where (age div 10)=(SELECT age div 10 FROM user WHERE userId=#{userId})
+    GROUP BY movieId
+    order by avg(ratingScore) desc
+      limit 10;
+  </select>
+<!-- rating 전부 갖고 오기-->
+  <select id="selectAllRatings" resultType="com.nettopulikkusu.DTO.ratingDTO">
+    select movieId, ratingScore, userId from ratings;
+  </select>
+<!-- 영화 메타데이터 가져오기 -->
+  <select id="selectMovieData" resultType="com.nettopulikkusu.DTO.titleDTO">
+    SELECT movieTitle, avg(ratingScore)
+    from user natural join movie natural join ratings
+    where movieId in
+    <foreach collection="list" item="movieId" open="(" separator="," close=")">
+      #{movieId}
+    </foreach>
+    group by movieId;
+  </select>
+</mapper>
