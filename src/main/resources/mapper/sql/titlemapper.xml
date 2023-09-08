@@ -14,14 +14,14 @@
 
   <!-- select movie by user like-->
   <select id="selectMovie" resultType="com.nettopulikkusu.DTO.titleDTO" parameterType="String">
-    SELECT movieTitle, ratingScore
+    SELECT movieId, movieTitle, ratingScore
     from user natural join movie natural join ratings
     where userId=#{userId}
     order by ratingScore desc;
   </select>
 <!-- 직업별 추천 -->
   <select id="selectOccupationMovie" resultType="com.nettopulikkusu.DTO.titleDTO" parameterType="String">
-    SELECT movieTitle, avg(ratingScore)
+    SELECT movieId, movieTitle, avg(ratingScore)
     FROM user natural join movie natural join ratings
     where occupation=(SELECT occupation FROM user WHERE userId=#{userId})
     GROUP BY movieId
@@ -30,7 +30,7 @@
   </select>
 <!-- 연령대별 추천-->
   <select id="selectAgeMovie" resultType="com.nettopulikkusu.DTO.titleDTO" parameterType="String">
-    SELECT movieTitle, avg(ratingScore)
+    SELECT movieId, movieTitle, avg(ratingScore)
     FROM user natural join movie natural join ratings
     where (age div 10)=(SELECT age div 10 FROM user WHERE userId=#{userId})
     GROUP BY movieId
@@ -43,12 +43,31 @@
   </select>
 <!-- 영화 메타데이터 가져오기 -->
   <select id="selectMovieData" resultType="com.nettopulikkusu.DTO.titleDTO">
-    SELECT movieTitle, avg(ratingScore)
+    SELECT movieId, movieTitle, avg(ratingScore)
     from user natural join movie natural join ratings
     where movieId in
     <foreach collection="list" item="movieId" open="(" separator="," close=")">
       #{movieId}
     </foreach>
     group by movieId;
+  </select>
+  <!-- MovieDetail-->
+  <select id="selectMovieDetail" resultType="com.nettopulikkusu.DTO.titleDetailDTO">
+    select movieId, movieTitle, avg(ratingScore) as ratingScore,
+           (select ratingScore from movie natural join ratings
+            where userId=#{userId} and movieId=#{movieId}) as myRatingScore
+    from movie natural join ratings where movieId=#{movieId};
+  </select>
+  <!-- MovieGenres-->
+  <select id="selectMovieGenres" resultType="String">
+    select distinct genre from movie_genres where movieId=#{movieId};
+  </select>
+  <!-- LikeGenres-->
+  <select id="selectLikeGenres" resultType="String">
+    select distinct genre from movie natural join movie_genres natural join ratings where userId=#{userId} group by genre order by avg(ratingScore) desc;
+  </select>
+  <!-- GenreMovies-->
+  <select id="selectLikeGenreMovies" resultType="com.nettopulikkusu.DTO.titleDTO">
+    select distinct movieId, movieTitle, 0 as ratingScore from movie natural join movie_genres where genre=#{genre};
   </select>
 </mapper>

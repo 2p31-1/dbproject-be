@@ -2,7 +2,10 @@ package com.nettopulikkusu.DAO;
 
 import com.nettopulikkusu.DTO.ratingDTO;
 import com.nettopulikkusu.DTO.titleDTO;
+import com.nettopulikkusu.DTO.titleDetailDTO;
 import com.nettopulikkusu.DTO.userDTO;
+
+import java.util.ArrayList;
 import java.util.List;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,5 +66,51 @@ public class titleDAO {
     titleDTOList=sqlSession.selectList(namespace+".selectMovieData", movieIdList);
 
     return titleDTOList;
+  }
+
+  public titleDetailDTO selectMovieDetail(String userId, String movieId) {
+    titleDetailDTO movieDetail=null;
+    List<String> genres=null;
+    class Param{
+      private String userId,movieId;
+
+      public String getUserId() {
+        return userId;
+      }
+
+      public void setUserId(String userId) {
+        this.userId = userId;
+      }
+
+      public String getMovieId() {
+        return movieId;
+      }
+
+      public void setMovieId(String movieId) {
+        this.movieId = movieId;
+      }
+    }
+    Param param = new Param();
+    param.setMovieId(movieId);
+    param.setUserId(userId);
+    genres=sqlSession.selectList(namespace+".selectMovieGenres", movieId);
+    movieDetail=sqlSession.selectOne(namespace+".selectMovieDetail", param);
+    movieDetail.setMovieGenre(genres);
+    return movieDetail;
+  }
+
+  public List<titleDTO> selectLikeGenreMovie(String userId) {
+    List<titleDTO> titleDTOList = new ArrayList<>();
+    List<String> genres=null;
+
+    genres=sqlSession.selectList(namespace+".selectLikeGenres", userId);
+    for(int i=0;i< genres.size()&&titleDTOList.size()<10;i++){
+      titleDTOList.addAll(sqlSession.selectList(namespace+".selectLikeGenreMovies", genres.get(i)));
+    }
+    while(titleDTOList.size()>10){
+      titleDTOList.remove(titleDTOList.size()-1);
+    }
+    return titleDTOList;
+    
   }
 }

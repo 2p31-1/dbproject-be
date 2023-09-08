@@ -2,6 +2,7 @@ package com.nettopulikkusu.Service;
 
 import com.nettopulikkusu.DAO.titleDAO;
 import com.nettopulikkusu.DTO.titleDTO;
+import com.nettopulikkusu.DTO.titleDetailDTO;
 import com.nettopulikkusu.DTO.userDTO;
 import com.nettopulikkusu.DTO.ratingDTO;
 
@@ -54,6 +55,20 @@ public class titleService {
     return nowUser;
   }
 
+  public titleDetailDTO selectMovieData(String userId, String movieId){
+    titleDetailDTO movieDetail=null;
+    movieDetail=titleDAO.selectMovieDetail(userId, movieId);
+    return movieDetail;
+  }
+
+  public List<titleDTO> selectLikeGenreMovie(String userId){
+
+    List<titleDTO>titleDTOList=null;
+
+    titleDTOList=titleDAO.selectLikeGenreMovie(userId);
+
+    return titleDTOList;
+  }
 
   public List<titleDTO> selectKNNMovies(String userId, int k){
     if(userId==null)return null;
@@ -140,7 +155,7 @@ public class titleService {
 
     //adding id of highest recommended movies
     List<Integer> movieIdList = new ArrayList<>();
-    for(int i=0;i<10;i++){
+    for(int i=0;i<10&&!moviePq.isEmpty();i++){
       movieIdList.add(moviePq.poll().getValue());
     }
 

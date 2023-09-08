@@ -1,12 +1,24 @@
 package com.nettopulikkusu.DTO;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class titleDTO {
 
   int movieId=0;
   String movieTitle="";
-  String movieGenre="";
-  int ratingScore=0;
+
+  public List<String> getMovieGenre() {
+    return movieGenre;
+  }
+
+  public void setMovieGenre(List<String> movieGenre) {
+    this.movieGenre = movieGenre;
+  }
+
+  List<String> movieGenre=new ArrayList<>();
+  double ratingScore=0;
   String IMDbUrl="";
 
   public int getMovieId() {
@@ -25,19 +37,12 @@ public class titleDTO {
     this.movieTitle = movieTitle;
   }
 
-  public String getMovieGenre() {
-    return movieGenre;
-  }
 
-  public void setMovieGenre(String movieGenre) {
-    this.movieGenre = movieGenre;
-  }
-
-  public int getRatingScore() {
+  public double getRatingScore() {
     return ratingScore;
   }
 
-  public void setRatingScore(int ratingScore) {
+  public void setRatingScore(double ratingScore) {
     this.ratingScore = ratingScore;
   }
 
